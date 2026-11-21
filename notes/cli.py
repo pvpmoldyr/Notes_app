@@ -32,9 +32,10 @@ def print_notes(notes):
         print(f"    {n.text}")
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None, service: NoteService | None = None) -> int:
+    """Run the CLI. Pass a service to override the default notes.json (e.g. in tests)."""
     args = build_parser().parse_args(argv)
-    service = NoteService()
+    service = service or NoteService()
     try:
         if args.command == "add":
             note = service.add(args.title, args.text)
