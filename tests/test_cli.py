@@ -30,3 +30,10 @@ def test_empty_title_prints_error_and_exits_1(service, capsys):
 def test_delete_unknown_id_prints_message_and_exits_1(service, capsys):
     assert main(["delete", "999"], service=service) == 1
     assert "No note with id 999." in capsys.readouterr().err
+
+def test_list_with_malformed_file_prints_error_and_exits_1(tmp_path, capsys):
+    path = tmp_path / "notes.json"
+    path.write_text('[{"x": 1}]', encoding="utf-8")
+    service = NoteService(path=path)
+    assert main(["list"], service=service) == 1
+    assert "Cannot read notes file" in capsys.readouterr().err

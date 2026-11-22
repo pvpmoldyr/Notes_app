@@ -6,14 +6,20 @@ from .models import Note
 
 DEFAULT_PATH = Path(__file__).resolve().parent.parent / "notes.json"
 
-
 def load_notes(path=DEFAULT_PATH):
-    """Return the list of saved notes (empty list if the file doesn't exist)."""
+    """Return the list of saved notes (empty list if the file doesn't exist).
+
+    Raises ValueError with a clear message if the file is corrupted.
+    """
     path = Path(path)
     if not path.exists():
         return []
-    with path.open(encoding="utf-8") as f:
-        return [Note(**item) for item in json.load(f)]
+    try:
+        with path.open(encoding="utf-8") as f:
+            data = json.load(f)
+        return [Note(**item) for item in data]
+    except (json.JSONDecodeError, TypeError) as error:
+        raise ValueError(f"Cannot read notes file {path.name}: {error}") from error
 
 
 def save_notes(notes, path=DEFAULT_PATH):
